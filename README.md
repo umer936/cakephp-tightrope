@@ -10,3 +10,12 @@ The recommended way to install composer packages is:
 ```
 composer require umer936/cake-p-h-p-tightrope
 ```
+
+Then you need to install the plugin into your application
+
+```
+bin/cake plugin load CakePHPTightrope
+bin/cake tightrope install
+```
+
+Now just don't make a mistake or make sure you commit your changes to version control
