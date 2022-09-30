@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace BootstrapUI\Command;
+namespace CakePHPTightrope\Command;
 
 use Cake\Command\Command;
 use Cake\Console\Arguments;
@@ -9,23 +9,23 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 
 /**
- * Modifies `AppView.php` to extend this plugin's `UIView` class.
+ * Modifies `ErrorController.php` to extend this plugin's `ErrorController` class.
  */
-class ModifyViewCommand extends Command
+class ModifyErrorCommand extends Command
 {
     /**
      * @inheritDoc
      */
     public function execute(Arguments $args, ConsoleIo $io)
     {
-        $io->info('Modifying view...');
+        $io->info('Modifying error controller...');
 
         $file = $args->getArgument('file');
         if ($file === null) {
             $file = $this->_getDefaultFilePath();
         }
 
-        if (!$this->_modifyView($file)) {
+        if (!$this->_modifyError($file)) {
             $io->error("Could not modify `$file`.");
             $this->abort();
         }
@@ -41,7 +41,7 @@ class ModifyViewCommand extends Command
      * @param string $filePath The path of the file to modify.
      * @return bool
      */
-    protected function _modifyView(string $filePath): bool
+    protected function _modifyError(string $filePath): bool
     {
         if (!$this->_isFile($filePath)) {
             return false;
@@ -52,19 +52,19 @@ class ModifyViewCommand extends Command
             return false;
         }
 
+//        $content = str_replace(
+//            'use Cake\\View\\View',
+//            'use CakePHPTightrope\\ErrorController',
+//            $content
+//        );
         $content = str_replace(
-            'use Cake\\View\\View',
-            'use BootstrapUI\\View\\UIView',
+            'class ErrorController extends AppController',
+            'class ErrorController extends \CakePHPTightrope\\Controller\\ErrorController',
             $content
         );
         $content = str_replace(
-            'class AppView extends View',
-            'class AppView extends UIView',
-            $content
-        );
-        $content = str_replace(
-            "    public function initialize(): void\n    {\n",
-            "    public function initialize(): void\n    {\n        parent::initialize();\n",
+            "    public function beforeFilter(EventInterface \$event)\n    {\n",
+            "    public function beforeFilter(EventInterface \$event)\n    {\n        parent::beforeFilter(\$event);\n",
             $content
         );
 
@@ -106,13 +106,13 @@ class ModifyViewCommand extends Command
     }
 
     /**
-     * Returns the default `AppView.php` file path.
+     * Returns the default `ErrorController.php` file path.
      *
      * @return string
      */
     protected function _getDefaultFilePath(): string
     {
-        return APP . 'View' . DS . 'AppView.php';
+        return APP . 'Controller' . DS . 'ErrorController.php';
     }
 
     /**
@@ -122,17 +122,17 @@ class ModifyViewCommand extends Command
     {
         return $parser
             ->setDescription(
-                'Modifies `AppView.php` to extend this plugin\'s `UIView` class.'
+                'Modifies `ErrorController.php` to extend this plugin\'s `ErrorController` class.'
             )
             ->addArgument('file', [
                 'help' => sprintf(
-                    'The path of the `AppView.php` file. Defaults to `%s`.',
+                    'The path of the `ErrorController` file. Defaults to `%s`.',
                     $this->_getDefaultFilePath()
                 ),
                 'required' => false,
             ])
             ->setEpilog(
-                '<warning>Don\'t run this command if you have a already modified the `AppView` class!</warning>'
+                '<warning>Don\'t run this command if you have a already modified the `ErrorController` class!</warning>'
             );
     }
 }
